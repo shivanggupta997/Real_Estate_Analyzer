@@ -61,11 +61,6 @@ real_estate_analyzer/
 │
 └── README.md
 
-yaml
-Copy
-Edit
-
----
 
 ## 📌 How to Run
 
