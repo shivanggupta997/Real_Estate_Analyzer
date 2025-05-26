@@ -1,0 +1,77 @@
+# django-backend-local.yaml
+
+# Defines a Deployment, which manages a set of identical Pods
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Name of this Deployment
+  name: django-backend-deployment
+  labels:
+    # Labels help organize resources and are used by Services to find Pods
+    app: django-backend
+spec:
+  # Number of identical Pods to run (1 is sufficient for local testing)
+  replicas: 2
+  # Selector defines which Pods this Deployment manages based on their labels
+  selector:
+    matchLabels:
+      app: django-backend
+  # Template defines the Pods that this Deployment will create
+  template:
+    metadata:
+      labels:
+        app: django-backend
+    spec:
+      containers:
+      # Defines the container that will run inside the Pod
+      - name: django-backend-container
+        # Name of your local Docker image (no ECR path needed with minikube docker-env)
+        image: real-estate-backend:latest
+        # IMPORTANT: Tells Kubernetes NOT to try pulling the image from a remote registry
+        imagePullPolicy: Never
+        # Port your Gunicorn server listens on inside the container
+        ports:
+        - containerPort: 8000
+        # Environment variables for your Django application
+        env:
+        # Example DB settings (adjust if using local SQLite or a separate DB container)
+        - name: DATABASE_NAME
+          value: "db.sqlite3" # Using Django's default SQLite for simplicity here
+        - name: DATABASE_USER
+          value: "user"
+        - name: DATABASE_PASSWORD
+          value: "password"
+        - name: DATABASE_HOST
+          value: "localhost"
+        - name: DATABASE_PORT
+          value: "5432"
+        # Django settings module
+        - name: DJANGO_SETTINGS_MODULE
+          value: "real_estate_chatbot_project.settings"
+        # Django SECRET_KEY (use a placeholder for local, don't hardcode sensitive info in prod)
+        - name: DJANGO_SECRET_KEY
+          value: "a_very_insecure_local_secret_key_for_testing_only"
+
+--- # Separator for multiple resources in one YAML file
+
+# Defines a Service, which provides stable network access to a set of Pods
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of this Service (this will be the internal DNS name within the cluster)
+  name: django-backend-service
+  labels:
+    app: django-backend
+spec:
+  # Selector tells the Service which Pods to route traffic to (matches Pod labels)
+  selector:
+    app: django-backend
+  ports:
+    # Defines the port mapping for the Service
+    - protocol: TCP
+      # Port on which this Service listens (within the cluster)
+      port: 8000
+      # Port on the container (within the Pod) to which traffic will be sent
+      targetPort: 8000
+  # ClusterIP means the Service is only accessible from within the Kubernetes cluster
+  type: ClusterIP

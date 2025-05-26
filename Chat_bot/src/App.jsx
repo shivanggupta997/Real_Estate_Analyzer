@@ -5,7 +5,9 @@ import ChatInput from './Components/ChatInput';
 import ChatMessage from './Components/ChatMessage';
 
 
-const API_URL = 'http://localhost:8000/api/analyze/'; 
+// const API_URL = 'http://localhost:8000/api/analyze/';
+// In Chat_bot/src/App.jsx
+const API_URL = process.env.VITE_APP_API_URL || 'http://localhost:8000/api/analyze/'; 
 
 function App() {
   const [messages, setMessages] = useState([

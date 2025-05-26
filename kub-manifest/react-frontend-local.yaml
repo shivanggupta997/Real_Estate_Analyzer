@@ -1,0 +1,50 @@
+# react-frontend-local.yaml
+
+# Defines a Deployment for the React frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-frontend-deployment
+  labels:
+    app: react-frontend
+spec:
+  replicas: 2 # 1 replica for local testing
+  selector:
+    matchLabels:
+      app: react-frontend
+  template:
+    metadata:
+      labels:
+        app: react-frontend
+    spec:
+      containers:
+      - name: react-frontend-container
+        image: real-estate-frontend:latest
+        imagePullPolicy: Never # IMPORTANT: For local images
+        # Port your Nginx server listens on inside the container
+        ports:
+        - containerPort: 80
+        env:
+        # Crucial: Your React app's API_URL needs to point to the backend service name inside Kubernetes
+        # Make sure your React code (App.jsx) reads this from process.env.REACT_APP_API_URL
+        - name: REACT_APP_API_URL
+          value: "http://django-backend-service:8000/api/analyze/" # K8s internal service DNS
+--- # Separator for multiple resources in one YAML file
+
+# Defines a Service for the React frontend
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-frontend-service
+  labels:
+    app: react-frontend
+spec:
+  selector:
+    app: react-frontend
+  ports:
+    - protocol: TCP
+      port: 80 # The port this Service will listen on (for external access)
+      targetPort: 80 # The container port to send traffic to
+  # NodePort makes the Service accessible on a static port on each node's IP address.
+  # This is common for local Kubernetes like Minikube.
+  type: NodePort

@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-rvi(05r-v2blntou9s5k2y=!xomh40u&s=&#mxbz9*l!egdc&x
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django-backend-service', '127.0.0.1', 'localhost', '192.168.49.2']
 
 
 # Application definition
@@ -130,8 +130,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-     "http://localhost:5173",
+    "http://localhost:5173",
+    "http://127.0.0.1",
+    "http://192.168.49.2",
 ]
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 DATA_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'real_estate_data.xlsx')
